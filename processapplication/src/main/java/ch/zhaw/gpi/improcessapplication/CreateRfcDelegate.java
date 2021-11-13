@@ -20,19 +20,19 @@ import camundajar.impl.com.google.gson.JsonObject;
 public class CreateRfcDelegate implements JavaDelegate {
 
     @Bean(name = "itsmRestClient")
-    public RestTemplate getActiveDirectoryRestClient(RestTemplateBuilder builder){
+    public RestTemplate getActiveDirectoryRestClient(RestTemplateBuilder builder) {
         return builder.build();
     }
 
     @Autowired
-    private RestTemplate itsmRestClient; 
+    private RestTemplate itsmRestClient;
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         String rfcTitle = (String) execution.getVariable("rfc_title");
         String rfcDescription = (String) execution.getVariable("rfc_description");
         String rfcReasons = (String) execution.getVariable("rfc_reasons");
-        
+
         JsonObject rfcAsJsonObject = new JsonObject();
         rfcAsJsonObject.addProperty("rTitle", rfcTitle);
         rfcAsJsonObject.addProperty("rDescription", rfcDescription);
@@ -45,14 +45,14 @@ public class CreateRfcDelegate implements JavaDelegate {
         HttpEntity<String> httpEntity = new HttpEntity<String>(rfcAsJsonObject.toString(), headers);
 
         try {
-            ResponseEntity<String> response = itsmRestClient.exchange("http://localhost:8090/api/rfcs", HttpMethod.POST, httpEntity, String.class);
+            ResponseEntity<String> response = itsmRestClient.exchange("http://localhost:8090/api/rfcs", HttpMethod.POST,
+                    httpEntity, String.class);
 
             String url = response.getHeaders().getLocation().toString();
-            String id = url.substring(url.lastIndexOf("/")+1, url.length());
+            String id = url.substring(url.lastIndexOf("/") + 1, url.length());
             execution.setVariable("rfc_id", Integer.valueOf(id));
         } catch (Exception e) {
             throw e;
         }
     }
-    
 }
